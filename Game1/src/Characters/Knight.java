@@ -4,22 +4,22 @@ import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Thief extends Character implements Attack{
+public class Knight extends Character implements Attack{
 
-    protected int stealth;
+    protected int power;
 
-    public Thief(String name, int stealth){
+    public Knight(String name, int power){
         super(name);
-        this.stealth = stealth;
+        this.power = power;
     }
 
-    // Adiciona stealth ao personagem.
-    public void AddStealth(int add){
-        stealth = stealth+add;
+    // Adiciona power ao personagem.
+    public void AddPower(int add){
+        power = power+add;
     }
 
-    public int getStealth(){
-        return stealth;
+    public int getPower(){
+        return power;
     }
 
     // Igual ao attack da classe Character.
@@ -37,16 +37,16 @@ public class Thief extends Character implements Attack{
             attack_power = (this.getAttackPoints() - enemy.getDefensePoints())+randomValue;
             switch (skill){
                 case 1:
-                    attack_power *= 1.4;
+                    attack_power *= 1;
                     break;
                 case 2:
-                    attack_power *= 1.2;
-                    break;
-                case 3:
                     attack_power *= 1.5;
                     break;
+                case 3:
+                    attack_power *= 1.2;
+                    break;
                 case 4:
-                    attack_power *= 1;
+                    attack_power *= 1.4;
                     break;
                 case 5:
                     if(attack_power == 0) attack_power = 5;
@@ -68,26 +68,26 @@ public class Thief extends Character implements Attack{
         }
     }
 
-    // Igual ao attack da classe Character.
+    // Igual ao attack da classe Character adiconado de power.
     public int getDefensePoints(){
-        return super.getDefensePoints();
+        return super.getDefensePoints() + getPower();
     }
 
-    // Igual ao attack da classe Character adicionado de stealth.
+    // Igual ao attack da classe Character.
     public int getAttackPoints(){
-        return super.getAttackPoints() + stealth;
+        return super.getAttackPoints();
     }
 
     public int chooseSkill(){
         int valid = 0;
         int choose = 0;
         int inputControl;
-        do{
-            System.out.println("1 - Sonic Blow      2 - Grimtooth");
-            System.out.println("3 - Soul Breaker    4 - Envenom");
-            System.out.println("5 - Meteor Assault (Especial)");
+
+        do {
+            System.out.println("1 - Bash [0]           2 - Magnum Break [40]");
+            System.out.println("3 - Spear Stab [10]     4 - Pierce [30]");
+            System.out.println("5 - Grand Cross (Especial)");
             Scanner in = new Scanner(System.in);
-            System.out.print("Skill: ");
             do {
                 inputControl = 0;
                 try {
@@ -119,25 +119,25 @@ public class Thief extends Character implements Attack{
         int valid = 0;
         switch (choose){
             case 1:
-                if(getMP() >= 30) {
-                    addMP(-30);
-                    valid = 1;
-                }
+                valid = 1;
                 break;
             case 2:
-                if(getMP() >= 10) {
-                    addMP(-10);
-                    valid = 1;
-                }
-                break;
-            case 3:
                 if(getMP() >= 40) {
                     addMP(-40);
                     valid = 1;
                 }
                 break;
+            case 3:
+                if(getMP() >= 10) {
+                    addMP(-10);
+                    valid = 1;
+                }
+                break;
             case 4:
-                valid = 1;
+                if(getMP() >= 30) {
+                    addMP(-30);
+                    valid = 1;
+                }
                 break;
             case 5:
                 if(getBonus() == 100){
@@ -146,8 +146,10 @@ public class Thief extends Character implements Attack{
                 }
                 break;
         }
+
         return valid;
 
     }
 
 }
+

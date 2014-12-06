@@ -1,3 +1,4 @@
+package Game;
 
 import Characters.Character;
 import Characters.Knight;
@@ -99,6 +100,7 @@ public class InGame {
 
         // Client Team setup
         System.out.println("###################\n#Choose your team!#\n###################\n");
+        System.out.println("###################\n#You have to choose 3 players!#\n###################\n");
 
         System.out.println("Choose your Team name!");
             Scanner in = new Scanner(System.in);
@@ -160,7 +162,7 @@ public class InGame {
         int c;
         control=0;
         do {
-            c =1;
+            c = 1;
             extension = (int) (10 * r.nextDouble() % charList.size());
             for (int j = 0; j < cpuTeam.getPlayerCount(); j++) { // cannot have double character
                 if (charList.get(extension).getName().equals(cpuTeam.getChar(j).getName())) {
@@ -241,6 +243,7 @@ public class InGame {
         itemsList.add(holygraal);
 
         System.out.println("\n###################\n#Choose your characters items!#\n###################\n");
+        System.out.println("You have to choose one Armor, one Weapon and one Potion per PLayer\n");
 
         int i=1;
         for (Item item : itemsList){
@@ -364,208 +367,75 @@ public class InGame {
     }
 
     public void battle(){
-        int counter=0;
-        int cpuSkill;
-        int endBattle=0;
+        ArrayList<PlayerThread> threads = new ArrayList<PlayerThread>();
 
-        do{
-            System.out.println("###################Round " + (counter+1) + "###################");
-            System.out.println(clientTeam.getName() + "                         CPU Team");
-            System.out.println(clientTeam.getChar(clientPlayer).getName() + "                         " + cpuTeam.getChar(cpuPlayer).getName() + "                         ");
-            System.out.println("HP: " + clientTeam.getChar(clientPlayer).getHP() + "                         HP: " + cpuTeam.getChar(cpuPlayer).getHP());
-            System.out.println("MP: " + clientTeam.getChar(clientPlayer).getMP() + "                         MP: " + cpuTeam.getChar(cpuPlayer).getMP());
-            System.out.println("Bonus: " + clientTeam.getChar(clientPlayer).getBonus() + "                         Bonus: " + cpuTeam.getChar(cpuPlayer).getBonus());
-            if(clientTeam.getChar(clientPlayer).getSpeed() > cpuTeam.getChar(cpuPlayer).getSpeed()){
-                // Client attack
-                System.out.println(clientTeam.getName() + " Turn!");
-                chooseAction(clientTeam, clientTeam.getChar(clientPlayer), cpuTeam.getChar(cpuPlayer));
+        // Client Team Thread
+        PlayerThread t1 = new PlayerThread(clientTeam.getChar(0),clientTeam, cpuTeam);
+        t1.start();
+        threads.add(t1);
+        PlayerThread t2 = new PlayerThread(clientTeam.getChar(1),clientTeam, cpuTeam);
+        t2.start();
+        threads.add(t2);
+        PlayerThread t3 = new PlayerThread(clientTeam.getChar(2),clientTeam, cpuTeam);
+        t3.start();
+        threads.add(t3);
 
-                // CPU attack
-                System.out.println("CPU Turn!");
-                if(cpuTeam.getChar(cpuPlayer).getHP() > 0){ // if the CPU player is alive he can attack, or use item
-                    if(cpuTeam.getChar(cpuPlayer).getHP() < 50 && cpuTeam.getChar(cpuPlayer).getNumberOfPotionItems() > 0){
-                        useItem(cpuTeam, cpuTeam.getChar(cpuPlayer));
-                    }else{
-                        System.out.println(cpuTeam.getChar(cpuPlayer).getName() + " attacked " + clientTeam.getChar(clientPlayer).getName());
-                        cpuSkill = cpuTeam.getChar(cpuPlayer).chooseSkillCPU();
-                        cpuTeam.getChar(cpuPlayer).attackCharacter(clientTeam.getChar(clientPlayer),cpuSkill);
-                    }
-                }else{ // if he is not alive then CPU must change its player if there is at least one alive.
-                    if(cpuTeam.getAlive() > 0) {
-                        changePlayer(cpuTeam, cpuTeam.getChar(cpuPlayer));
-                    }else{ // if CPU's players are all dead. Battle ends.
-                       System.out.print("Todos mortos");
-                        endBattle = 1;
-                    }
-                }
-            }else{
-                // CPU attack
-                System.out.println("CPU Turn!");
-                if(cpuTeam.getChar(cpuPlayer).getHP() < 50 && cpuTeam.getChar(cpuPlayer).getNumberOfPotionItems() > 0){
-                    useItem(cpuTeam, cpuTeam.getChar(cpuPlayer));
-                }else{
-                    System.out.println(cpuTeam.getChar(cpuPlayer).getName() + " attacked " + clientTeam.getChar(clientPlayer).getName());
-                    cpuSkill = cpuTeam.getChar(cpuPlayer).chooseSkillCPU();
-                    cpuTeam.getChar(cpuPlayer).attackCharacter(clientTeam.getChar(clientPlayer),cpuSkill);
-                }
+        // CPU Team Thread
+        PlayerThread t4 = new PlayerThread(cpuTeam.getChar(0), cpuTeam, clientTeam);
+        t4.start();
+        threads.add(t4);
+        PlayerThread t5 = new PlayerThread(cpuTeam.getChar(1), cpuTeam, clientTeam);
+        t5.start();
+        threads.add(t5);
+        PlayerThread t6 = new PlayerThread(cpuTeam.getChar(2), cpuTeam, clientTeam);
+        t6.start();
+        threads.add(t6);
 
-                // Client attack
-                System.out.println(clientTeam.getName() + " Turn!");
-                if(clientTeam.getChar(clientPlayer).getHP() > 0) { // if the Client player is alive he can attack, or use item
-                    chooseAction(clientTeam, clientTeam.getChar(clientPlayer),cpuTeam.getChar(cpuPlayer));
 
-                    if(cpuTeam.getChar(cpuPlayer).getHP() == 0){
-                        changePlayer(cpuTeam,cpuTeam.getChar(cpuPlayer));
-                    }
-                } else { // if he is not alive then Client must change its player if there is at least one alive.
-                    if(clientTeam.getAlive() > 0) {
-                        changePlayer(clientTeam, clientTeam.getChar(clientPlayer)); // Change player and attack
-                        chooseAction(clientTeam, clientTeam.getChar(clientPlayer),cpuTeam.getChar(cpuPlayer));
-
-                        if(cpuTeam.getChar(cpuPlayer).getHP() == 0){
-                            if(cpuTeam.getAlive() > 0) {
-                                changePlayer(cpuTeam, cpuTeam.getChar(cpuPlayer));
-                            }else{
-                                endBattle = 1;
-                            }
+        int round=1;
+        int oldRound = 0;
+        while (clientTeam.getAlive() > 0 && cpuTeam.getAlive() > 0){
+            if(oldRound < round) {
+                System.out.println("Round: " + round);
+                System.out.println(t1.getPlayerName()+" HP: " + t1.getPlayerHP()+" game: "+t1.getGameRound()+" round:"+t1.getRound());
+                System.out.println(t2.getPlayerName()+" HP: " + t2.getPlayerHP()+" game: "+t2.getGameRound()+" round:"+t2.getRound());
+                System.out.println(t3.getPlayerName()+" HP: " + t3.getPlayerHP()+" game: "+t3.getGameRound()+" round:"+t3.getRound());
+                System.out.println(t4.getPlayerName()+" HP: " + t4.getPlayerHP()+" game: "+t4.getGameRound()+" round:"+t4.getRound());
+                System.out.println(t5.getPlayerName()+" HP: " + t5.getPlayerHP()+" game: "+t5.getGameRound()+" round:"+t5.getRound());
+                System.out.println(t6.getPlayerName()+" HP: " + t6.getPlayerHP()+" game: "+t6.getGameRound()+" round:"+t6.getRound());
+                oldRound++;
+            }
+            if(round == t1.getRound() && round == t2.getRound() && round == t3.getRound() && round == t4.getRound() && round == t5.getRound() && round == t6.getRound()){
+                round++;
+                t1.setGameRound(round);
+                t2.setGameRound(round);
+                t3.setGameRound(round);
+                t4.setGameRound(round);
+                t5.setGameRound(round);
+                t6.setGameRound(round);
+                /*for(PlayerThread thr : threads) {
+                    thr.setGameRound(round);
+                    if(thr.getClientPlayer() != clientPlayer){
+                        clientPlayer = thr.getClientPlayer();
+                        for(PlayerThread thre : threads){
+                            thre.setClientPlayer(clientPlayer);
                         }
-                    } else{ // if Client's players are all dead. Battle ends.
-                        endBattle = 1;
                     }
-                }
-            }
-            if(clientTeam.getChar(clientPlayer).getHP() == 0){
-                if(clientTeam.getAlive() > 0) {
-                    System.out.println("\n" + clientTeam.getChar(clientPlayer).getName() + " is dead. Choose another player.");
-                    changePlayer(clientTeam, clientTeam.getChar(clientPlayer));
-                }else{
-                    endBattle = 1;
-                }
-            }
+                }*/
 
-            System.out.println("\n\n");
-            counter++;
-        }while(endBattle == 0);
 
-        if(cpuTeam.getAlive() > 0){
-            System.out.println("\n\nCPU Team won!");
+            }
         }
         if(clientTeam.getAlive() > 0){
-            System.out.println("\n\n" + clientTeam.getName() + " won!");
-        }
-    }
-
-    public void chooseAction(Team attackerTeam, Character attacker, Character attacked){
-        int choose = 0;
-        int inputControl;
-        Scanner in = new Scanner(System.in);
-        System.out.println("[1] Attack    [2] Item    [3] Change Character");
-        do {
-            inputControl = 0;
-            System.out.println(attacker.getNumberOfPotionItems());
-            try {
-                System.out.print("choose: ");
-                choose = in.nextInt();
-            } catch (InputMismatchException e){
-                inputControl = 1;
-                in.next();
-            }
-            if(choose == 2 && attacker.getNumberOfPotionItems() < 0){
-                System.out.println("Inventory is empty.");
-                inputControl = 1;
-            }
-
-        }while(inputControl == 1 || !(choose > 0 && choose <= 3));
-        switch (choose){
-            case 1:
-                System.out.println(attacker.getName() + " attacked " + attacked.getName());
-                attacker.attackCharacter(attacked,attacker.chooseSkill());
-                break;
-            case 2:
-                useItem(attackerTeam, attacker);
-                break;
-            case 3:
-                changePlayer(attackerTeam,attacker);
-                break;
-        }
-
-    }
-
-    public void useItem(Team userTeam, Character user){
-        String itemName = "";
-        int inputControl;
-        Scanner in = new Scanner(System.in);
-
-        if(user.getNumberOfPotionItems() > 0) {
-            if (!userTeam.getName().equals("CPU Team")) {
-                user.listPotionItems();
-                do {
-                    inputControl = 0;
-                    try {
-                        System.out.print("choose: ");
-                        itemName = in.nextLine();
-                    } catch (InputMismatchException e) {
-                        inputControl = 1;
-                        in.next();
-                    }
-                } while (inputControl == 1 || !(user.equipItem(itemName)));
-                //user.unequipItem(itemName);
-            } else {
-                for(int i=0; i < user.getNumberOfItems(); i++){
-                    itemName = user.searchItem(i).getName();
-                    if(user.searchItem(i).getClass().equals(HealthPotion.class) || user.searchItem(i).getClass().equals(ManaPotion.class)){
-                        user.equipItem(itemName);
-                        System.out.println(user.getName() + " used " + itemName);
-                        break;
-                    }
-                }
-            }
-
-
-
-        }
-
-    }
-
-    public void changePlayer(Team attackerTeam, Character attacker){
-        int i=0;
-        int choose=0;
-        int inputControl;
-        Scanner in = new Scanner(System.in);
-
-        if(!attackerTeam.getName().equals("CPU Team")) {
-            for (i = 0; i < attackerTeam.getPlayerCount(); i++) {
-                if(attackerTeam.getChar(i).getHP() > 0) {
-                    System.out.println("[" + (i + 1) + "]" + attackerTeam.getChar(i).getName());
-                }
-            }
-            do {
-                inputControl = 0;
-                try {
-                    System.out.print("choose: ");
-                    choose = in.nextInt();
-                } catch (InputMismatchException e) {
-                    inputControl = 1;
-                    in.next();
-                }
-                try {
-                    if (attackerTeam.getChar(choose - 1).getHP() == 0) { // cannot change to a dead player
-                        inputControl = 1;
-                    }
-                }catch (IndexOutOfBoundsException e){}
-            } while (inputControl == 1 || !(choose > 0 && choose <= attackerTeam.getPlayerCount()));
-
-            clientPlayer = choose - 1;
-            System.out.println(attackerTeam.getChar(choose-1).getName() + " selected!");
+            System.out.println(clientTeam.getName() + " win!");
         }else{
-            Random r = new Random();
-            do {
-                choose = (int) (10 * r.nextDouble() % 3);
-            }while((choose == cpuPlayer) || !(choose >= 0 && choose < attackerTeam.getPlayerCount()) || (attackerTeam.getChar(choose).getHP() == 0));
-            cpuPlayer = choose;
+            System.out.println(cpuTeam.getName() + " win!");
         }
-
     }
+
+
+
+
 
 
     public void stop(){
@@ -592,5 +462,17 @@ public class InGame {
         {
             //  Handle any exceptions.
         }
+    }
+
+    public static void main(String args[]){
+        InGame game = new InGame();
+
+        game.start();
+        game.setupTeams();
+        game.setupItems();
+        game.battle();
+
+
+        game.stop();
     }
 }
