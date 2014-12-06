@@ -396,24 +396,34 @@ public class InGame {
         int oldRound = 0;
         while (clientTeam.getAlive() > 0 && cpuTeam.getAlive() > 0){
             if(oldRound < round) {
-                System.out.println("Round: " + round);
-                System.out.println(t1.getPlayerName()+" HP: " + t1.getPlayerHP()+" game: "+t1.getGameRound()+" round:"+t1.getRound());
-                System.out.println(t2.getPlayerName()+" HP: " + t2.getPlayerHP()+" game: "+t2.getGameRound()+" round:"+t2.getRound());
-                System.out.println(t3.getPlayerName()+" HP: " + t3.getPlayerHP()+" game: "+t3.getGameRound()+" round:"+t3.getRound());
-                System.out.println(t4.getPlayerName()+" HP: " + t4.getPlayerHP()+" game: "+t4.getGameRound()+" round:"+t4.getRound());
-                System.out.println(t5.getPlayerName()+" HP: " + t5.getPlayerHP()+" game: "+t5.getGameRound()+" round:"+t5.getRound());
-                System.out.println(t6.getPlayerName()+" HP: " + t6.getPlayerHP()+" game: "+t6.getGameRound()+" round:"+t6.getRound());
+                System.out.println("\n########Round: " + round+"########\n");
+                // Show HP
+                System.out.print(t1.getPlayerName()+" HP: " + t1.getPlayerHP()+"     ");
+                System.out.print(t2.getPlayerName() + " HP: " + t2.getPlayerHP() + "     ");
+                System.out.print(t3.getPlayerName() + " HP: " + t3.getPlayerHP() + "     ");
+                System.out.print(t4.getPlayerName() + " HP: " + t4.getPlayerHP() + "     ");
+                System.out.print(t5.getPlayerName() + " HP: " + t5.getPlayerHP() + "     ");
+                System.out.println(t6.getPlayerName() + " HP: " + t6.getPlayerHP());
+                // Show MP
+                System.out.print(t1.getPlayerName()+" MP: " + t1.getPlayerMP()+"     ");
+                System.out.print(t2.getPlayerName() + " MP: " + t2.getPlayerMP() + "     ");
+                System.out.print(t3.getPlayerName() + " MP: " + t3.getPlayerMP() + "     ");
+                System.out.print(t4.getPlayerName() + " MP: " + t4.getPlayerMP() + "     ");
+                System.out.print(t5.getPlayerName() + " MP: " + t5.getPlayerMP() + "     ");
+                System.out.println(t6.getPlayerName() + " MP: " + t6.getPlayerMP());
+                // Show Bonus
+                System.out.print(t1.getPlayerName()+" Bonus: " + t1.getPlayerBonus()+"     ");
+                System.out.print(t2.getPlayerName() + " Bonus: " + t2.getPlayerBonus() + "     ");
+                System.out.print(t3.getPlayerName() + " Bonus: " + t3.getPlayerBonus() + "     ");
+                System.out.print(t4.getPlayerName() + " Bonus: " + t4.getPlayerBonus() + "     ");
+                System.out.print(t5.getPlayerName() + " Bonus: " + t5.getPlayerBonus() + "     ");
+                System.out.println(t6.getPlayerName() + " Bonus: " + t6.getPlayerBonus());
                 oldRound++;
             }
             if(round == t1.getRound() && round == t2.getRound() && round == t3.getRound() && round == t4.getRound() && round == t5.getRound() && round == t6.getRound()){
                 round++;
-                t1.setGameRound(round);
-                t2.setGameRound(round);
-                t3.setGameRound(round);
-                t4.setGameRound(round);
-                t5.setGameRound(round);
-                t6.setGameRound(round);
-                /*for(PlayerThread thr : threads) {
+
+                for(PlayerThread thr : threads) {
                     thr.setGameRound(round);
                     if(thr.getClientPlayer() != clientPlayer){
                         clientPlayer = thr.getClientPlayer();
@@ -421,11 +431,18 @@ public class InGame {
                             thre.setClientPlayer(clientPlayer);
                         }
                     }
-                }*/
-
-
+                }
             }
         }
+        System.out.println("\n\n#####Battle Finished#####");
+        for(PlayerThread thr : threads) {
+            thr.interrupt();
+        }
+        System.out.print(t1.getPlayerName() + " HP: " + t1.getPlayerHP() + "     ");
+        System.out.print(t2.getPlayerName() + " HP: " + t2.getPlayerHP() + "     ");
+        System.out.print(t3.getPlayerName() + " HP: " + t3.getPlayerHP() + "     ");
+        System.out.print(t4.getPlayerName() + " HP: " + t4.getPlayerHP() + "     ");
+        System.out.println(t5.getPlayerName() + " HP: " + t5.getPlayerHP() + "     \n");
         if(clientTeam.getAlive() > 0){
             System.out.println(clientTeam.getName() + " win!");
         }else{

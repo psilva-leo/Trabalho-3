@@ -30,23 +30,39 @@ public class PlayerThread extends Thread{
     }
 
     public void run(){
-        while (player.getHP() > 0) {
-            if(gameRound > 1)
-                System.out.println(gameRound + "   " +round);
-            if(gameRound > round) {
-                if (id == clientPlayer) {
-                    chooseAction();
-                } else {
-                    if (player.getNumberOfPotionItems() > 0 && player.getHP() < 50) {
-                        useItem();
+        while (true) {
+            if(player.getHP() > 0) {
+                if (gameRound > round) {
+                    if (id == clientPlayer) {
+                        chooseAction();
                     } else {
-                        Random r = new Random();
-                        int attacked = (int) (10 * r.nextDouble() % 3);
-                        System.out.println(player.getName() + " attacked " + enemyTeam.getChar(attacked).getName());
-                        player.attackCharacter(enemyTeam.getChar(attacked), player.chooseSkillCPU());
+                        if (player.getNumberOfPotionItems() > 0 && player.getHP() < 50) {
+                            useItem();
+                        } else {
+                            Random r = new Random();
+                            int attacked;
+                            do {
+                                attacked = (int) (10 * r.nextDouble() % 3);
+                            }while(enemyTeam.getChar(attacked).getHP() == 0);
+                            System.out.println(player.getName() + " attacked " + enemyTeam.getChar(attacked).getName());
+                            player.attackCharacter(enemyTeam.getChar(attacked), player.chooseSkillCPU());
+                        }
                     }
+                    round++;
                 }
-                round++;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) { }
+            }else{
+                if (gameRound > round) {
+                    if(id == clientPlayer && charTeam.getAlive()>0){
+                        changePlayer();
+                    }
+                    round++;
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) { }
             }
         }
     }
@@ -60,6 +76,10 @@ public class PlayerThread extends Thread{
     public String getPlayerName() { return player.getName(); }
 
     public int getPlayerHP() { return player.getHP(); }
+
+    public int getPlayerMP() { return player.getMP(); }
+
+    public int getPlayerBonus() { return player.getBonus(); }
 
     public int getRound(){
         return round;
@@ -82,7 +102,7 @@ public class PlayerThread extends Thread{
         int inputControl;
         Scanner in = new Scanner(System.in);
         Random r = new Random();
-        int cpuPlayer = (int) (10 * r.nextDouble() % 3);
+        int cpuPlayer;
 
         System.out.println("[1] Attack    [2] Item    [3] Change Character");
         do {
@@ -102,6 +122,9 @@ public class PlayerThread extends Thread{
         }while(inputControl == 1 || !(choose > 0 && choose <= 3));
         switch (choose){
             case 1:
+                do{
+                    cpuPlayer = (int) (10 * r.nextDouble() % 3);
+                }while(enemyTeam.getChar(cpuPlayer).getHP() == 0);
                 System.out.println(player.getName() + " attacked " + enemyTeam.getChar(cpuPlayer).getName());
                 player.attackCharacter(enemyTeam.getChar(cpuPlayer), player.chooseSkill());
                 break;
@@ -172,7 +195,7 @@ public class PlayerThread extends Thread{
                     itemName = player.searchItem(i).getName();
                     if(player.searchItem(i).getClass().equals(HealthPotion.class) || player.searchItem(i).getClass().equals(ManaPotion.class)){
                         player.equipItem(itemName);
-                        System.out.println(this.getName() + " used " + itemName);
+                        System.out.println(player.getName() + " used " + itemName);
                         break;
                     }
                 }
