@@ -488,8 +488,6 @@ public class InGame {
         game.setupTeams();
         game.setupItems();
         game.battle();
-
-
         game.stop();
     }
 }

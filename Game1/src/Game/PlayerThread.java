@@ -69,10 +69,6 @@ public class PlayerThread extends Thread{
 
     public int getClientPlayer(){ return clientPlayer; }
 
-    public int getID(){
-        return id;
-    }
-
     public String getPlayerName() { return player.getName(); }
 
     public int getPlayerHP() { return player.getHP(); }
@@ -83,10 +79,6 @@ public class PlayerThread extends Thread{
 
     public int getRound(){
         return round;
-    }
-
-    public int getGameRound(){
-        return gameRound;
     }
 
     public void setGameRound(int round){
